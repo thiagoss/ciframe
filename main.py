@@ -5,6 +5,7 @@ import sys
 from musica import *
 from collections import OrderedDict
 import unicodedata
+import importlib
 
 app = Flask(__name__)
 
@@ -22,8 +23,7 @@ def limpa_cifra(raw_cifra):
                 cifra += tokens
     return cifra
 
-reload(sys)
-sys.setdefaultencoding('utf8')
+importlib.reload(sys)
 
 # colunas do csv
 ARTISTA_ID = 0
