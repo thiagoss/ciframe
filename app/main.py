@@ -1,6 +1,9 @@
 # coding: utf-8
 import json
 from flask import Flask, request
+from flask_pymongo import PyMongo
+from pymongo import MongoClient
+from bson import json_util
 import sys
 from musica import *
 from collections import OrderedDict
@@ -8,6 +11,11 @@ import unicodedata
 import importlib
 
 app = Flask(__name__)
+app.config["MONGO_URI"] = "mongodb://db:27017/deciframe"
+
+# Connect to MongoDB using Flask's PyMongo wrapper
+mongo = PyMongo(app)
+db = mongo.db
 
 def limpa_cifra(raw_cifra):
     cifra = []
@@ -144,9 +152,27 @@ def remover_combinantes(string):
     params: pagina. Caso não seja definida a página, o valor default é 1.
     exemplo 1: /musica?pagina=2
     exemplo 2: /musica'''
-@app.route('/musicas')
+@app.route('/musicas', methods=['GET'])
 def get_musicas():
-    return json.dumps([v.__dict__ for v in musicas.values()])
+    pagina = request.args.get('pagina')
+    if pagina is None or pagina == "":
+        pagina = 1
+
+    try:
+        pagina = int(pagina)
+    except ValueError:
+        return {"mensagem": "Página inválida"}, 400
+    pagina -= 1
+    if pagina < 0:
+        return {"mensagem": "Página inválida"}, 400
+
+    skip = pagina * TAM_PAGINA
+    limit = TAM_PAGINA
+
+    return json.dumps(list(db.musicas.find()
+                           .skip(skip)
+                           .limit(TAM_PAGINA)),
+                      default=json_util.default), 200
 
 @app.route('/generos')
 def get_generos():
