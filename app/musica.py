@@ -26,6 +26,9 @@ def limpa_cifra(raw_cifra):
     return cifra
 
 
+def acordes_da_cifra(cifra):
+    return list(set(cifra))
+
 
 class Musica:
 
@@ -43,7 +46,7 @@ class Musica:
             self.popularidade = popularidade
             self.tom = tom
             self.cifra = cifra
-            self.acordes = list(set(cifra))
+            self.acordes = acordes_da_cifra(cifra)
             self.seqs_famosas = seqs_famosas
 
             self.id_unico_musica = '%s_%s' % (id_artista, id_musica)

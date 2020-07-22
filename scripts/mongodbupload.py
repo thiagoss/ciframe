@@ -30,6 +30,9 @@ def criar_entrada_musica(linha):
     if seq_famosa == 'NA':
         seq_famosa = None
 
+    cifra = musica.limpa_cifra(linha[musica.CIFRA].split(";"))
+    acordes = musica.acordes_da_cifra(cifra)
+
     return {
         "id": id_unico,
         "id-artista": linha[musica.ARTISTA_ID],
@@ -38,9 +41,10 @@ def criar_entrada_musica(linha):
         "musica": linha[musica.MUSICA],
         "genero": linha[musica.GENERO],
         "popularidade": int(linha[musica.POPULARIDADE]),
-        "seq-famosa": linha[musica.SEQ_FAMOSA],
+        "seq-famosa": seq_famosa,
         "tom": linha[musica.TOM],
-        "cifra": musica.limpa_cifra(linha[musica.CIFRA]),
+        "acordes": acordes,
+        "cifra": cifra,
     }
 
 
