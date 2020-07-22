@@ -1,3 +1,16 @@
+# Constantes
+# colunas do csv
+ARTISTA_ID = 0
+MUSICA_ID = 1
+ARTISTA = 2
+MUSICA = 3
+GENERO = 4
+POPULARIDADE = 5
+TOM = 6
+SEQ_FAMOSA = 7
+CIFRA = 8
+
+
 class Musica:
 
     def __init__(self, id_artista, nome_artista, id_musica, nome_musica,

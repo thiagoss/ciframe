@@ -25,16 +25,6 @@ def limpa_cifra(raw_cifra):
 
 importlib.reload(sys)
 
-# colunas do csv
-ARTISTA_ID = 0
-MUSICA_ID = 1
-ARTISTA = 2
-MUSICA = 3
-GENERO = 4
-POPULARIDADE = 5
-TOM = 6
-SEQ_FAMOSA = 7
-CIFRA = 8
 TAM_PAGINA = 100
 
 genero_musicas = {}
