@@ -40,7 +40,7 @@ def criar_entrada_musica(linha):
         "popularidade": int(linha[musica.POPULARIDADE]),
         "seq-famosa": linha[musica.SEQ_FAMOSA],
         "tom": linha[musica.TOM],
-        "cifra": linha[musica.CIFRA],
+        "cifra": musica.limpa_cifra(linha[musica.CIFRA]),
     }
 
 

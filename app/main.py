@@ -17,20 +17,6 @@ app.config["MONGO_URI"] = "mongodb://db:27017/deciframe"
 mongo = PyMongo(app)
 db = mongo.db
 
-def limpa_cifra(raw_cifra):
-    cifra = []
-    for m in raw_cifra:
-        if m.strip() != '':
-            # filtra tablaturas
-            if '|' in m:
-                acorde = m.split('|')[0].split()[0]
-                cifra.append(acorde)
-            # lida com acordes separados por espaço
-            else:
-                tokens = [token for token in m.split()]
-                cifra += tokens
-    return cifra
-
 importlib.reload(sys)
 
 TAM_PAGINA = 100
