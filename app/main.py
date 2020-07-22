@@ -2,7 +2,7 @@
 import json
 from flask import Flask, request
 from flask_pymongo import PyMongo
-from pymongo import MongoClient
+import pymongo
 from bson import json_util
 import sys
 from musica import *
@@ -171,7 +171,8 @@ def get_musicas():
 
     return json.dumps(list(db.musicas.find()
                            .skip(skip)
-                           .limit(TAM_PAGINA)),
+                           .limit(TAM_PAGINA)
+                           .sort('popularidade', pymongo.DESCENDING)),
                       default=json_util.default), 200
 
 @app.route('/generos')
