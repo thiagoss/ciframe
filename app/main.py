@@ -173,8 +173,10 @@ def get_acordes():
 
 @app.route('/musica/<m_id>/')
 def get_musica(m_id):
-    return json.dumps(db.musicas.find_one({"_id": ObjectId(m_id)}),
-                      default=json_util.default), 200
+    musica = db.musicas.find_one({"_id": ObjectId(m_id)})
+    if musica is None:
+        return {"mensagem": "Música não encontrada"}, 404
+    return json.dumps(musica, default=json_util.default), 200
 
 @app.route('/similares')
 def get_similares():
