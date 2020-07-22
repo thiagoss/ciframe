@@ -3,7 +3,7 @@ import json
 from flask import Flask, request
 from flask_pymongo import PyMongo
 import pymongo
-from bson import json_util
+from bson import json_util, ObjectId
 import sys
 from musica import *
 from collections import OrderedDict
@@ -185,7 +185,8 @@ def get_acordes():
 
 @app.route('/musica/<m_id>/')
 def get_musica(m_id):
-    return json.dumps(musicas[m_id].__dict__)
+    return json.dumps(db.musicas.find_one({"_id": ObjectId(m_id)}),
+                      default=json_util.default), 200
 
 @app.route('/similares')
 def get_similares():
