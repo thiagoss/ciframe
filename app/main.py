@@ -163,7 +163,9 @@ def get_musicas():
 
 @app.route('/generos')
 def get_generos():
-    return json.dumps(generos)
+    return json.dumps(list(db.musicas.find()
+                           .distinct("genero")),
+                      default=json_util.default), 200
 
 @app.route('/acordes')
 def get_acordes():
