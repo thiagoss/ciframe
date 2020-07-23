@@ -32,11 +32,13 @@ def criar_entrada_musica(linha):
 
     cifra = musica.limpa_cifra(linha[musica.CIFRA].split(";"))
     acordes = musica.acordes_da_cifra(cifra)
+    id_artista = linha[musica.ARTISTA_ID]
+    id_musica = linha[musica.MUSICA_ID]
 
     return {
         "id": id_unico,
-        "id-artista": linha[musica.ARTISTA_ID],
-        "id-musica": linha[musica.MUSICA_ID],
+        "id-artista": id_artista,
+        "id-musica": id_musica,
         "artista": linha[musica.ARTISTA],
         "musica": linha[musica.MUSICA],
         "genero": linha[musica.GENERO],
@@ -45,6 +47,7 @@ def criar_entrada_musica(linha):
         "tom": linha[musica.TOM],
         "acordes": acordes,
         "cifra": cifra,
+        "url": 'http://www.cifraclub.com.br/%s/%s' % (id_artista, id_musica),
     }
 
 
