@@ -156,13 +156,13 @@ def get_musicas():
                            .sort('popularidade', pymongo.DESCENDING)),
                       default=json_util.default), 200
 
-@app.route('/generos')
+@app.route('/generos', methods=['GET'])
 def get_generos():
     return json.dumps(list(db.musicas.find()
                            .distinct("genero")),
                       default=json_util.default), 200
 
-@app.route('/acordes')
+@app.route('/acordes', methods=['GET'])
 def get_acordes():
     acordes = list(
             db.musicas.aggregate([
@@ -176,7 +176,7 @@ def get_acordes():
         acordes = acordes[0].get('todosAcordes', [])
     return json.dumps(acordes, default=json_util.default), 200
 
-@app.route('/musica/<m_id>/')
+@app.route('/musica/<m_id>/', methods=['GET'])
 def get_musica(m_id):
     musica = db.musicas.find_one({"_id": ObjectId(m_id)})
     if musica is None:
