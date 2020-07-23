@@ -1,21 +1,28 @@
 # coding: utf-8
 import json
+import redis
 from flask import Flask, request
 from flask_pymongo import PyMongo
+from flask_redis import FlaskRedis
 import pymongo
 from bson import json_util, ObjectId
 import sys
+from cacheutils import *
 from musica import *
 from collections import OrderedDict
 import unicodedata
 import importlib
 
+
 app = Flask(__name__)
 app.config["MONGO_URI"] = "mongodb://db:27017/deciframe"
+app.config["REDIS_URL"] = "redis://:@cache:6379/0"
 
 # Connect to MongoDB using Flask's PyMongo wrapper
 mongo = PyMongo(app)
 db = mongo.db
+
+redis_client = FlaskRedis(app)
 
 importlib.reload(sys)
 
@@ -164,6 +171,10 @@ def get_generos():
 
 @app.route('/acordes', methods=['GET'])
 def get_acordes():
+    cache_key = criar_cache_key('/acordes', request)
+    resultado_em_cache = redis_client.get(cache_key)
+    if resultado_em_cache:
+        return resultado_em_cache, 200
     acordes = list(
             db.musicas.aggregate([
                 {'$project': {'acordes': 1}},
@@ -174,7 +185,9 @@ def get_acordes():
     if len(acordes) > 0:
         # So deve ter 1 resultado
         acordes = acordes[0].get('todosAcordes', [])
-    return json.dumps(acordes, default=json_util.default), 200
+    resposta = json.dumps(acordes, default=json_util.default)
+    redis_client.set(cache_key, resposta)
+    return resposta, 200
 
 @app.route('/musica/<m_id>/', methods=['GET'])
 def get_musica(m_id):
