@@ -1,6 +1,7 @@
 # coding: utf-8
 import json
 import redis
+import functools
 from flask import Flask, request
 from flask_pymongo import PyMongo
 from flask_redis import FlaskRedis
@@ -12,6 +13,7 @@ from musica import *
 from collections import OrderedDict
 import unicodedata
 import importlib
+
 
 
 app = Flask(__name__)
@@ -87,6 +89,23 @@ for k,v in genero_musicas.items():
 f.close()
 
 
+def usar_cache(ttl):
+    def decorator(func):
+        @functools.wraps(func)
+        def verificar_cache(*args, **kwargs):
+            cache_key = criar_cache_key(request.path, request)
+            resultado_em_cache = redis_client.get(cache_key)
+            if resultado_em_cache:
+                return resultado_em_cache, 200
+            resposta, codigo_http = func(*args, **kwargs)
+
+            salvar_em_cache(redis_client, cache_key, resposta, ttl)
+            return resposta, 200
+
+        return verificar_cache
+    return decorator
+
+
 @app.route('/')
 def index():
     return app.send_static_file('index.html')
@@ -141,6 +160,7 @@ def remover_combinantes(string):
     exemplo 1: /musica?pagina=2
     exemplo 2: /musica'''
 @app.route('/musicas', methods=['GET'])
+@usar_cache(UMA_HORA)
 def get_musicas():
     pagina = request.args.get('pagina')
     if pagina is None or pagina == "":
@@ -170,11 +190,8 @@ def get_generos():
                       default=json_util.default), 200
 
 @app.route('/acordes', methods=['GET'])
+@usar_cache(UM_DIA)
 def get_acordes():
-    cache_key = criar_cache_key('/acordes', request)
-    resultado_em_cache = redis_client.get(cache_key)
-    if resultado_em_cache:
-        return resultado_em_cache, 200
     acordes = list(
             db.musicas.aggregate([
                 {'$project': {'acordes': 1}},
@@ -186,7 +203,6 @@ def get_acordes():
         # So deve ter 1 resultado
         acordes = acordes[0].get('todosAcordes', [])
     resposta = json.dumps(acordes, default=json_util.default)
-    redis_client.set(cache_key, resposta)
     return resposta, 200
 
 @app.route('/musica/<m_id>/', methods=['GET'])
