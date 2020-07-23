@@ -23,7 +23,6 @@ TAM_PAGINA = 100
 
 genero_musicas = {}
 generos = set()
-acordes = set()
 sequencias = {'BmGDA' : 0,
         'CGAmF' : 1,
         'EmG' : 2,
@@ -59,10 +58,6 @@ for line in f:
             musica[TOM], musica[CIFRA])
 
     musicas_dict[musica_obj.id_unico_musica] = musica_obj
-
-    # conjunto único de acordes
-    for acorde in musica_obj.acordes:
-        acordes.add(acorde)
 
     # constrói dict mapeando gênero para músicas
     # deve ser usado para melhorar o desempenho das buscas
@@ -169,7 +164,17 @@ def get_generos():
 
 @app.route('/acordes')
 def get_acordes():
-    return json.dumps(list(acordes))
+    acordes = list(
+            db.musicas.aggregate([
+                {'$project': {'acordes': 1}},
+                {'$unwind': {'path': "$acordes"}},
+                {'$group': {'_id': 1,
+                            'todosAcordes': {'$addToSet': "$acordes"}}}
+            ]))
+    if len(acordes) > 0:
+        # So deve ter 1 resultado
+        acordes = acordes[0].get('todosAcordes', [])
+    return json.dumps(acordes, default=json_util.default), 200
 
 @app.route('/musica/<m_id>/')
 def get_musica(m_id):
